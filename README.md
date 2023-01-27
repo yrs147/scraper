@@ -20,13 +20,13 @@ Golang Web Scraper is a tool that allows users to scrape search results from Goo
 
 ```
 git clone https://github.com/yrs147/scraper.git 
-cd google-search-scraper
+cd scraper
 ```
 
 2.  Build and run the project
 
 ```
-go build ./google-search-scraper
+go build ./scraper
 ```
 
 3.  Input the search term, country code, and language code in the prompt
