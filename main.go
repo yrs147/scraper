@@ -11,6 +11,7 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
+// Map of supported google domains by country code
 var googleDomains = map[string]string{
 	"com": "https://www.google.com/search?q=",
 	"ac":  "https://www.google.ac/search?q=",
@@ -212,6 +213,7 @@ var googleDomains = map[string]string{
 	"zw":  "https://www.google.co.zw/search?q=",
 }
 
+// Struct to hold search results
 type SearchResult struct {
 	ResultRank  int
 	ResultURL   string
@@ -219,6 +221,7 @@ type SearchResult struct {
 	ResultDesc  string
 }
 
+// List of user agents to randomly choose from
 var userAgents = []string{
 	"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36",
 	"Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36",
@@ -228,12 +231,14 @@ var userAgents = []string{
 	"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Safari/604.1.38",
 }
 
+// Returns a random user agent from the list of user agents
 func randUserAgent() string {
 	rand.Seed(time.Now().Unix())
 	randNum := rand.Int() % len(userAgents)
 	return userAgents[randNum]
 }
 
+// Build URLs for search term, country code, language code and number of pages 
 func buildUrls(searchTerm, countryCode, languageCode string, pages, count int) ([]string, error) {
 	toScrape := []string{}
 	searchTerm = strings.Trim(searchTerm, " ")
@@ -250,6 +255,7 @@ func buildUrls(searchTerm, countryCode, languageCode string, pages, count int) (
 	}
 	return toScrape, nil
 }
+// Parse HTML from search result and return search result array 
 func resultParsing(response *http.Response, rank int) ([]SearchResult, error) {
 	doc, err := goquery.NewDocumentFromResponse(response)
 	if err != nil {
@@ -282,6 +288,8 @@ func resultParsing(response *http.Response, rank int) ([]SearchResult, error) {
 	}
 	return results, err
 }
+
+// Return http client with proxy or without 
 func getScrapeClient(proxyString interface{}) *http.Client {
 	switch v := proxyString.(type) {
 	case string:
@@ -293,6 +301,7 @@ func getScrapeClient(proxyString interface{}) *http.Client {
 	}
 }
 
+// Scrape search results for search term, country code, language code, proxy, number of pages and results per page 
 func Scrape(searchTerm, countryCode, languageCode string, proxyString interface{}, pages, count, backoff int) ([]SearchResult, error) {
 	results := []SearchResult{}
 	resultCounter := 0
@@ -318,6 +327,7 @@ func Scrape(searchTerm, countryCode, languageCode string, proxyString interface{
 	return results, nil
 }
 
+// Send GET request to search URL with randomized user agent and check for errors
 func scrapeClientRequest(searchURL string, proxyString interface{}) (*http.Response, error) {
 	baseClient := getScrapeClient(proxyString)
 	req, _ := http.NewRequest("GET", searchURL, nil)
